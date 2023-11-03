@@ -1,4 +1,10 @@
-
+/*
+ * File: finder.cpp
+ * Copyright (c) 2023 Loupe
+ * https://loupe.team
+ * 
+ * This file is part of Finder, licensed under the MIT License.
+ */
 #include <bur/plctypes.h>
 #ifdef __cplusplus
 extern "C" {
