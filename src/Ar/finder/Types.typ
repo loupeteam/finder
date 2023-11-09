@@ -5,6 +5,7 @@
  * 
  * This file is part of Finder, licensed under the MIT License.
  *)
+
 TYPE
 	finder_typ : 	STRUCT 
 		in : finderIn_typ;
