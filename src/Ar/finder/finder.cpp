@@ -35,27 +35,41 @@ class outbuf : public std::streambuf {
 
 outbuf::outbuf(char *data, size_t sz) : _front(data), _current(data), _sz(sz) {
 	// no buffering, overflow on every char
+	rolled = false;
 	setp(0, 0);
 }
 int outbuf::overflow(int_type c) {
-	// add the char to wherever you want it, for example:
+	if (c == traits_type::eof()) {
+		return traits_type::not_eof(c);
+	}
 
-	if (_current - _front > _sz) {
+	size_t pos = (size_t)(_current - _front);
+	if (pos >= _sz) {
 		_current = _front;
 		rolled = true;
+		pos = 0;
 	}
 
 	switch (c) {
 		case '\n':
-			if (_current - _front < _sz) {
+			if (pos < _sz) {
 				(*_current) = 0;
 			}
-			_current = (char *)((((((UDINT)_current - (UDINT)_front) / 81) + 1) * 81) +
-				(UDINT)_front);
+			{
+				size_t nextPos = ((pos / 81) + 1) * 81;
+				if (nextPos >= _sz) {
+					_current = _front;
+					rolled = true;
+				} else {
+					_current = _front + nextPos;
+				}
+			}
 			return c;
 		default:
-			(*_current) = c;
-			_current++;
+			if (pos < _sz) {
+				(*_current) = (char)c;
+				_current++;
+			}
 			break;
 	}
 	return c;
@@ -90,11 +104,13 @@ unsigned long sBuf) {
 				// CurrentFileIndex=0; This variable is never used again.
 				in->out.done = 			0;
 				if( strcmp( in->in.cwd, in->internal.cwd) != 0 || in->in.refresh ){
-					strncpy(in->internal.cwd, in->in.cwd, sizeof(in->internal.cwd));
+					strncpy(in->internal.cwd, in->in.cwd, sizeof(in->internal.cwd) - 1);
+					in->internal.cwd[sizeof(in->internal.cwd) - 1] = 0;
 
 					std::string s1(in->in.cwd);
 					s1 = s1.substr(0, s1.find_last_of("\\/"));
-					strncpy(in->internal.path, s1.c_str(), sizeof(in->internal.cwd));					
+					strncpy(in->internal.path, s1.c_str(), sizeof(in->internal.path) - 1);
+					in->internal.path[sizeof(in->internal.path) - 1] = 0;
 
 					in->out.updating = 		1;
 					in->internal.state = 	1;					
@@ -160,14 +176,14 @@ unsigned long sBuf) {
 					if (in->internal.directoryRead.status == ERR_OK) {
 						in->internal.directoryRead.enable = 0;
 						in->internal.state = in->internal.state + 1;
-					} else if (in->internal.directoryRead.status = fiERR_NO_MORE_ENTRIES) {
+					} else if (in->internal.directoryRead.status == fiERR_NO_MORE_ENTRIES) {
 						out << "]}";
 						in->out.updating = 		0;
 						in->out.done = 			1;
 						in->out.status = ERR_OK;
 						in->internal.state = 5;
 					} else {
-						if (in->internal.directoryRead.status = 20799) {
+						if (in->internal.directoryRead.status == 20799) {
 							in->out.status = FileIoGetSysError();
 						} else {
 							in->out.status = in->internal.directoryRead.status;
@@ -236,6 +252,8 @@ unsigned long sBuf) {
 				return 0;
 			//      }
 		}
+
+	return 0;
 }
 
 //	UpdateTimer.PT = T #60s;
