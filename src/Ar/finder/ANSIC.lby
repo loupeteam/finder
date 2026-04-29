@@ -9,6 +9,6 @@
   </Files>
   <Dependencies>
     <Dependency ObjectName="FileIO" />
-    <Dependency ObjectName="stringext" Version="1.0.0" />
+    <Dependency ObjectName="stringext" FromVersion="1.0.0" />
   </Dependencies>
 </Library>
