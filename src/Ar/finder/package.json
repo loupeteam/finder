@@ -1,0 +1,15 @@
+{
+  "name": "@loupeteam/finder",
+  "version": "0.0.0",
+  "description": "String/array search utility library for B&R Automation Studio",
+  "homepage": "https://loupeteam.github.io/LoupeDocs/libraries/finder.html",
+  "scripts": {},
+  "keywords": [],
+  "author": "Loupe",
+  "license": "MIT",
+  "repository": { "type": "git", "url": "https://github.com/loupeteam/finder" },
+  "lpm": { "type": "library" },
+  "dependencies": {
+    "@loupeteam/stringext": ">=1.0.0"
+  }
+}
